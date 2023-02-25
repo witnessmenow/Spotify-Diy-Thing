@@ -15,7 +15,7 @@ ESP32 With Built in 320x240 LCD with Touch Screen (ESP32-2432S028R), buy from wh
 - [Aliexpress*](https://s.click.aliexpress.com/e/_DkSpIjB)
 - [Aliexpress*](https://s.click.aliexpress.com/e/_DkcmuCh)
 - [Aliexpress](https://www.aliexpress.com/item/1005004502250619.htm)
-- [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html)
+- [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html) - Makerfabs also sell what is required to make a [similar project with an RGB Matrix panel](https://github.com/witnessmenow/Spotify-NFC-Matrix-Display/blob/master/README.md)
     
  * = Affilate Link
  
