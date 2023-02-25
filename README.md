@@ -11,11 +11,11 @@ This project is a Work in Progress!
 
 ## Hardware Required
 
-ESP32 With Built in 320x240 LCD with Touch Screen, buy from wherever works out cheapest for you:
-    - [Aliexpress*](https://s.click.aliexpress.com/e/_DkSpIjB)
-    - [Aliexpress*](https://s.click.aliexpress.com/e/_DkcmuCh)
-    - [Aliexpress](https://www.aliexpress.com/item/1005004502250619.htm)
-    - [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html)
+ESP32 With Built in 320x240 LCD with Touch Screen (ESP32-2432S028R), buy from wherever works out cheapest for you:
+- [Aliexpress*](https://s.click.aliexpress.com/e/_DkSpIjB)
+- [Aliexpress*](https://s.click.aliexpress.com/e/_DkcmuCh)
+- [Aliexpress](https://www.aliexpress.com/item/1005004502250619.htm)
+- [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html)
     
  * = Affilate Link
  
