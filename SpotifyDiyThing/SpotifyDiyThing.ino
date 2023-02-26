@@ -39,20 +39,22 @@
 
 #include "displayCode.h"
 
+#include "touchScreen.h"
+
 #include "serialPrint.h"
 
 //------- Replace the following! ------
 
-//char ssid[] = "SSID";         // your network SSID (name)
-//char password[] = "password"; // your network password
+char ssid[] = "SSID";         // your network SSID (name)
+char password[] = "password"; // your network password
 //
-//char clientId[] = "56t4373258u3405u43u543";     // Your client ID of your spotify APP
-//char clientSecret[] = "56t4373258u3405u43u543"; // Your client Secret of your spotify APP (Do Not share this!)
+char clientId[] = "56t4373258u3405u43u543";     // Your client ID of your spotify APP
+char clientSecret[] = "56t4373258u3405u43u543"; // Your client Secret of your spotify APP (Do Not share this!)
 //
 //// Country code, including this is advisable
-//#define SPOTIFY_MARKET "IE"
+#define SPOTIFY_MARKET "IE"
 //
-//#define SPOTIFY_REFRESH_TOKEN "AAAAAAAAAABBBBBBBBBBBCCCCCCCCCCCDDDDDDDDDDD"
+#define SPOTIFY_REFRESH_TOKEN "AAAAAAAAAABBBBBBBBBBBCCCCCCCCCCCDDDDDDDDDDD"
 
 //------- ---------------------- ------
 
@@ -83,6 +85,9 @@ unsigned long requestDueTime;               // time when request due
 unsigned long delayBetweenProgressUpdates = 500; // Time between requests (0.5 seconds)
 unsigned long progressDueTime;               // time when request due
 
+unsigned long touchScreenCoolDownInterval = 1000; // How long after a touch press do we accept another (1 seconds)
+unsigned long touchScreenCoolDownTime;               // time when cool down has expired
+
 long songStartMillis;
 long songDuration;
 
@@ -91,6 +96,7 @@ void setup()
   Serial.begin(115200);
 
   displaySetup(&spotify);
+  touchSetup(&spotify);
 
   // Initialise SPIFFS, if this fails try .begin(true)
   // NOTE: I believe this formats it though it will erase everything on
@@ -219,5 +225,10 @@ void loop()
     }
     displayTrackProgress(songProgress, songDuration);
     progressDueTime = millis() + delayBetweenProgressUpdates;
+  }
+
+  if(millis() > touchScreenCoolDownTime && handleTouched()){
+    requestDueTime = 0; //force refresh
+    touchScreenCoolDownTime  = millis() + touchScreenCoolDownInterval; //Cool the touch off
   }
 }
