@@ -34,3 +34,8 @@ The following libraries need to be installed for this project to work:
 | [ArduinoJson](https://github.com/bblanchon/ArduinoJson)                                           | Dependancy of the Spotify API               | Yes ("Arduino Json")         |
 | [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                                    | For decoding the album art images           | Yes ("JPEGDEC")              |
 
+### Display Config
+
+This project makes use of [TFT_eSPI library by Bodmer](https://github.com/Bodmer/TFT_eSPI).
+
+TFT_eSPI is configured using a "User_Setup.h" file in the library folder, you will need to replace this file with the one in the `Display Config` folder of this repo.
