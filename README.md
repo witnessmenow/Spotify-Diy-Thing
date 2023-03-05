@@ -33,6 +33,7 @@ The following libraries need to be installed for this project to work:
 | [SpotifyArduino](https://github.com/witnessmenow/spotify-api-arduino)                             | For interacting with Spotify API            | No                                |
 | [ArduinoJson](https://github.com/bblanchon/ArduinoJson)                                           | Dependancy of the Spotify API               | Yes ("Arduino Json")         |
 | [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                                    | For decoding the album art images           | Yes ("JPEGDEC")              |
+| [XPT2046 Touchscreen](https://github.com/PaulStoffregen/XPT2046_Touchscreen)                      | For handling the touch screen               | Yes ("XPT2046")              |
 
 ### Display Config
 
