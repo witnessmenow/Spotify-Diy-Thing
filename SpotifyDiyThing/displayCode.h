@@ -6,9 +6,11 @@
 // file name for where to save the image.
 #define ALBUM_ART "/album.jpg"
 
-int imageSize = 150;
+int imageHeight = 150;
+int imageWidth = 150;
 int screenWidth = 320;
 int screenHeight = 240;
+int screenCenterX = screenWidth / 2;
 
 TFT_eSPI tft = TFT_eSPI();
 JPEGDEC jpeg;
@@ -60,7 +62,7 @@ int displayImage(char *imageFileUri) {
   lTime = millis();
   jpeg.open((const char *) imageFileUri, myOpen, myClose, myRead, mySeek, JPEGDraw);
   jpeg.setPixelType(1);
-  int imagePosition = (screenWidth / 2) - (imageSize / 2);
+  int imagePosition = screenCenterX - (imageWidth / 2);
   // decode will return 1 on sucess and 0 on a failure
   int decodeStatus = jpeg.decode(imagePosition, 0, JPEG_SCALE_HALF);
   //jpeg.decode(45, 0, 0);
@@ -108,19 +110,18 @@ int displayImageUsingFile(char *albumArtUrl)
 }
 
 void clearImage() {
-  int imagePosition = (screenWidth / 2) - (imageSize / 2);
-  tft.fillRect(imagePosition, 0, imageSize, imageSize, TFT_BLACK);
+  int imagePosition = screenCenterX - (imageWidth / 2);
+  tft.fillRect(imagePosition, 0, imageWidth, imageHeight, TFT_BLACK);
 }
 
 void printCurrentlyPlayingToScreen(CurrentlyPlaying currentlyPlaying) {
-  // Clear the song area
-  int textStartY = imageSize + 30;
-  int screenCenter = screenWidth / 2;
+  // Clear the album artand progress bar
+  int textStartY = imageHeight + 30;
   tft.fillRect(0, textStartY, screenWidth, screenHeight - textStartY, TFT_BLACK);
 
-  tft.drawCentreString(currentlyPlaying.trackName, screenCenter, textStartY, 2);
-  tft.drawCentreString(currentlyPlaying.artists[0].artistName, screenCenter, textStartY + 18, 2);
-  tft.drawCentreString(currentlyPlaying.albumName, screenCenter, textStartY + 36, 2);
+  tft.drawCentreString(currentlyPlaying.trackName, screenCenterX, textStartY, 2);
+  tft.drawCentreString(currentlyPlaying.artists[0].artistName, screenCenterX, textStartY + 18, 2);
+  tft.drawCentreString(currentlyPlaying.albumName, screenCenterX, textStartY + 36, 2);
 }
 
 void displayTrackProgress(long progress, long duration) {
@@ -137,7 +138,51 @@ void displayTrackProgress(long progress, long duration) {
   int barXWidth = map(clampedPercentage, 0, 100, 0, screenWidth - 40);
   Serial.println(barXWidth);
 
-  tft.drawRect(19, imageSize + 5, screenWidth - 38, 20, TFT_WHITE);
-  tft.fillRect(20, imageSize + 6, barXWidth, 18, TFT_WHITE);
-  tft.fillRect(20 + barXWidth, imageSize + 6, (screenWidth - 20) - (20 + barXWidth), 18, TFT_BLACK);
+  int progressStartY = imageHeight + 5;
+
+  // Draw outer Rectangle, in theory we only need to do this once!
+  tft.drawRect(19, progressStartY, screenWidth - 38, 20, TFT_WHITE);
+
+  // Draw the white portion of the filled bar
+  tft.fillRect(20, progressStartY + 1, barXWidth, 18, TFT_WHITE);
+
+  // Fill whats left black
+  tft.fillRect(20 + barXWidth, progressStartY + 1, (screenWidth - 20) - (20 + barXWidth), 18, TFT_BLACK);
+}
+
+void setImageSize(SpotifyImage image) {
+  imageHeight = image.height / 2;
+  imageWidth = image.width / 2;
+}
+
+void drawTouchButtons(bool backStatus, bool forwardStatus) {
+
+  int buttonCenterY = 75;
+  int leftButtonCenterX = 40;
+  int rightButtonCenterX = screenWidth - leftButtonCenterX;
+
+  // Draw back Button
+  tft.fillCircle(leftButtonCenterX, buttonCenterY, 16, TFT_BLACK);
+  tft.drawCircle(leftButtonCenterX, buttonCenterY, 16, TFT_WHITE);
+  if (backStatus) {
+    tft.fillCircle(leftButtonCenterX, buttonCenterY, 15, TFT_GREEN);
+  } else {
+    tft.drawCircle(leftButtonCenterX, buttonCenterY, 15, TFT_WHITE);
+  }
+
+  tft.fillTriangle(leftButtonCenterX - 4, buttonCenterY, leftButtonCenterX + 6, buttonCenterY - 10, leftButtonCenterX + 6, buttonCenterY + 10, TFT_WHITE);
+  tft.drawRect(leftButtonCenterX - 6, buttonCenterY - 10, 2, 20, TFT_WHITE);
+
+  // Draw forward Button
+  tft.fillCircle(rightButtonCenterX, buttonCenterY, 16, TFT_BLACK);
+  tft.drawCircle(rightButtonCenterX, buttonCenterY, 16, TFT_WHITE);
+  if (forwardStatus) {
+    tft.fillCircle(rightButtonCenterX, buttonCenterY, 15, TFT_GREEN);
+  } else {
+    tft.drawCircle(rightButtonCenterX, buttonCenterY, 15, TFT_WHITE);
+  }
+
+
+  tft.fillTriangle(rightButtonCenterX + 4, buttonCenterY, rightButtonCenterX - 6, buttonCenterY - 10, rightButtonCenterX - 6, buttonCenterY + 10, TFT_WHITE);
+  tft.drawRect(rightButtonCenterX + 6, buttonCenterY - 10, 2, 20, TFT_WHITE);
 }

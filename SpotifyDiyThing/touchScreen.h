@@ -7,6 +7,9 @@
 #define XPT2046_CLK 25
 #define XPT2046_CS 33
 
+bool previousTrackStatus = false;
+bool nextTrackStatus = false;
+
 SPIClass mySpi = SPIClass(HSPI);
 
 XPT2046_Touchscreen ts(XPT2046_CS, XPT2046_IRQ);  // Param 2 - Touch IRQ Pin - interrupt enabled polling
@@ -20,7 +23,10 @@ void touchSetup(SpotifyArduino *spotifyObj) {
   spotify_touch = spotifyObj;
 }
 
-bool handleTouched(){
+
+bool handleTouched() {
+  previousTrackStatus = false;
+  nextTrackStatus = false;
   if (ts.tirqTouched() && ts.touched()) {
     TS_Point p = ts.getPoint();
     Serial.print("Pressure = ");
@@ -31,15 +37,17 @@ bool handleTouched(){
     Serial.print(p.y);
     delay(30);
     Serial.println();
-    if(p.x < 1000){
-      spotify_touch->previousTrack();
+    if (p.x < 1000) {
+      previousTrackStatus = true;
+      //spotify_touch->previousTrack();
       return true;
-    } else if(p.x > 2800){
-      spotify_touch->nextTrack();
+    } else if (p.x > 2800) {
+      nextTrackStatus = true;
+      //spotify_touch->nextTrack();
       return true;
     }
   }
-  
+
   return false;
-  
+
 }

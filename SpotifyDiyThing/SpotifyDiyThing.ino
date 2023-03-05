@@ -28,7 +28,6 @@
 #include <JPEGDEC.h>
 // Library for decoding Jpegs from the API responses
 
-
 #include <SpotifyArduino.h>
 #include <ArduinoJson.h>
 
@@ -58,6 +57,7 @@ char clientSecret[] = "56t4373258u3405u43u543"; // Your client Secret of your sp
 
 //------- ---------------------- ------
 
+
 // including a "spotify_server_cert" variable
 // header is included as part of the SpotifyArduino libary
 #include <SpotifyArduinoCert.h>
@@ -85,7 +85,7 @@ unsigned long requestDueTime;               // time when request due
 unsigned long delayBetweenProgressUpdates = 500; // Time between requests (0.5 seconds)
 unsigned long progressDueTime;               // time when request due
 
-unsigned long touchScreenCoolDownInterval = 1000; // How long after a touch press do we accept another (1 seconds)
+unsigned long touchScreenCoolDownInterval = 200;  // How long after a touch press do we accept another (0.2 seconds). There is also an APi request inbetween
 unsigned long touchScreenCoolDownTime;               // time when cool down has expired
 
 long songStartMillis;
@@ -138,6 +138,8 @@ void setup()
   {
     Serial.println("Failed to get access tokens");
   }
+
+  drawTouchButtons(false, false);
 }
 
 void getNewAlbumArt(CurrentlyPlaying currentlyPlaying) {
@@ -189,6 +191,7 @@ void loop()
       String newAlbum = String(medImage.url);
       if (newAlbum != lastAlbumArtUrl)
       {
+        setImageSize(medImage);
         Serial.println("Updating Art");
         clearImage();
         char *my_url = const_cast<char *>(medImage.url);
@@ -227,8 +230,15 @@ void loop()
     progressDueTime = millis() + delayBetweenProgressUpdates;
   }
 
-  if(millis() > touchScreenCoolDownTime && handleTouched()){
-    requestDueTime = 0; //force refresh
+  if (millis() > touchScreenCoolDownTime && handleTouched()) {
+    drawTouchButtons(previousTrackStatus, nextTrackStatus);
+    if (previousTrackStatus) {
+      spotify.previousTrack();
+    } else if (nextTrackStatus) {
+      spotify.nextTrack();
+    }
+    drawTouchButtons(false, false);
+    requestDueTime = 0; //Some button has been pressed and acted on, it surely impacts the status so force a refresh
     touchScreenCoolDownTime  = millis() + touchScreenCoolDownInterval; //Cool the touch off
   }
 }
