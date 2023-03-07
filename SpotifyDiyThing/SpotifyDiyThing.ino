@@ -40,21 +40,22 @@
 
 #include "touchScreen.h"
 
+#include "configFile.h"
+
+#include "refreshToken.h"
+
 #include "serialPrint.h"
 
 //------- Replace the following! ------
 
 char ssid[] = "SSID";         // your network SSID (name)
 char password[] = "password"; // your network password
-//
+
 char clientId[] = "56t4373258u3405u43u543";     // Your client ID of your spotify APP
 char clientSecret[] = "56t4373258u3405u43u543"; // Your client Secret of your spotify APP (Do Not share this!)
-//
-//// Country code, including this is advisable
-#define SPOTIFY_MARKET "IE"
-//
-#define SPOTIFY_REFRESH_TOKEN "AAAAAAAAAABBBBBBBBBBBCCCCCCCCCCCDDDDDDDDDDD"
 
+// Country code, including this is advisable
+#define SPOTIFY_MARKET "IE"
 //------- ---------------------- ------
 
 
@@ -75,7 +76,7 @@ char *songName;
 char *songArtist;
 
 WiFiClientSecure client;
-SpotifyArduino spotify(client, clientId, clientSecret, SPOTIFY_REFRESH_TOKEN);
+SpotifyArduino spotify(client, clientId, clientSecret);
 
 // You might want to make this much smaller, so it will update responsively
 
@@ -129,6 +130,20 @@ void setup()
   Serial.println(WiFi.localIP());
 
   client.setCACert(spotify_server_cert);
+
+  pinMode(0, INPUT); //has an internal pullup
+  
+  if (digitalRead(0) == LOW || !fetchConfigFile(refreshToken)) {
+    // Failed to load refresh token for whatever reason, starting the flow to fetch it
+    Serial.println("Launching refresh token flow");
+    if(launchRefreshTokenFlow(&spotify, clientId)){
+      Serial.print("Refresh Token: ");
+      Serial.println(refreshToken);
+      saveConfigFile(refreshToken);
+    }
+  }
+
+  spotify.setRefreshToken(refreshToken);
 
   // If you want to enable some extra debugging
   // uncomment the "#define SPOTIFY_DEBUG" in SpotifyArduino.h

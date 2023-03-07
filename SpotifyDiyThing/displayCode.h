@@ -126,17 +126,17 @@ void printCurrentlyPlayingToScreen(CurrentlyPlaying currentlyPlaying) {
 
 void displayTrackProgress(long progress, long duration) {
 
-  Serial.print("Elapsed time of song (ms): ");
-  Serial.print(progress);
-  Serial.print(" of ");
-  Serial.println(duration);
-  Serial.println();
+//  Serial.print("Elapsed time of song (ms): ");
+//  Serial.print(progress);
+//  Serial.print(" of ");
+//  Serial.println(duration);
+//  Serial.println();
 
   float percentage = ((float)progress / (float)duration) * 100;
   int clampedPercentage = (int)percentage;
-  Serial.println(clampedPercentage);
+  //Serial.println(clampedPercentage);
   int barXWidth = map(clampedPercentage, 0, 100, 0, screenWidth - 40);
-  Serial.println(barXWidth);
+  //Serial.println(barXWidth);
 
   int progressStartY = imageHeight + 5;
 
