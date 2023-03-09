@@ -11,6 +11,12 @@
  *******************************************************************/
 
 // ----------------------------
+// Library Defines - Need to be defined before library import
+// ----------------------------
+
+#define ESP_DRD_USE_SPIFFS      true
+
+// ----------------------------
 // Standard Libraries
 // ----------------------------
 #include <WiFi.h>
@@ -22,6 +28,18 @@
 // ----------------------------
 // Additional Libraries - each one of these will need to be installed.
 // ----------------------------
+
+#include <WiFiManager.h>
+// Captive portal for configuring the WiFi
+
+// If installing from the library manager (Search for "WifiManager")
+// https://github.com/tzapu/WiFiManager
+
+#include <ESP_DoubleResetDetector.h>
+// A library for checking if the reset button has been pressed twice
+// Can be used to enable config mode
+// Can be installed from the library manager (Search for "ESP_DoubleResetDetector")
+//https://github.com/khoih-prog/ESP_DoubleResetDetector
 
 #include <TFT_eSPI.h>
 
@@ -46,13 +64,9 @@
 
 #include "serialPrint.h"
 
+#include "WifiManager.h"
+
 //------- Replace the following! ------
-
-char ssid[] = "SSID";         // your network SSID (name)
-char password[] = "password"; // your network password
-
-char clientId[] = "56t4373258u3405u43u543";     // Your client ID of your spotify APP
-char clientSecret[] = "56t4373258u3405u43u543"; // Your client Secret of your spotify APP (Do Not share this!)
 
 // Country code, including this is advisable
 #define SPOTIFY_MARKET "IE"
@@ -96,6 +110,14 @@ void setup()
 {
   Serial.begin(115200);
 
+  bool forceConfig = false;
+
+  drd = new DoubleResetDetector(DRD_TIMEOUT, DRD_ADDRESS);
+  if (drd->detectDoubleReset()) {
+    Serial.println(F("Forcing config mode as there was a Double reset detected"));
+    forceConfig = true;
+  }
+
   displaySetup(&spotify);
   touchSetup(&spotify);
 
@@ -113,33 +135,47 @@ void setup()
   }
   Serial.println("\r\nInitialisation done.");
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("");
-
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  //  WiFi.mode(WIFI_STA);
+  //  WiFi.begin(ssid, password);
+  //  Serial.println("");
+  //
+  //  // Wait for connection
+  //  while (WiFi.status() != WL_CONNECTED)
+  //  {
+  //    delay(500);
+  //    Serial.print(".");
+  //  }
+  //  Serial.println("");
+  //  Serial.print("Connected to ");
+  //  Serial.println(ssid);
+  //  Serial.print("IP address: ");
+  //  Serial.println(WiFi.localIP());
 
   client.setCACert(spotify_server_cert);
 
   pinMode(0, INPUT); //has an internal pullup
-  
-  if (digitalRead(0) == LOW || !fetchConfigFile(refreshToken)) {
-    // Failed to load refresh token for whatever reason, starting the flow to fetch it
+  refreshToken[0] = '\0';
+  if (!fetchConfigFile(refreshToken, clientId, clientSecret)) {
+    // Failed to fetch config file, need to launch Wifi Manager
+    forceConfig = true;
+  }
+
+  setupWiFiManager(forceConfig, refreshToken, &saveConfigFile, &drawWifiManagerMessage);
+
+  // If we are here we should be connected to the Wifi
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  spotify.lateInit(clientId, clientSecret);
+
+  // Check if we have a refresh Token
+  if (digitalRead(0) == LOW || refreshToken[0] == '\0') {
+    drawRefreshTokenMessage();
     Serial.println("Launching refresh token flow");
-    if(launchRefreshTokenFlow(&spotify, clientId)){
+    if (launchRefreshTokenFlow(&spotify, clientId)) {
       Serial.print("Refresh Token: ");
       Serial.println(refreshToken);
-      saveConfigFile(refreshToken);
+      saveConfigFile(refreshToken, clientId, clientSecret);
     }
   }
 
@@ -153,7 +189,7 @@ void setup()
   {
     Serial.println("Failed to get access tokens");
   }
-
+  tft.fillScreen(TFT_BLACK);
   drawTouchButtons(false, false);
 }
 
@@ -192,6 +228,7 @@ void handleCurrentlyPlaying(CurrentlyPlaying currentlyPlaying) {
 
 void loop()
 {
+  drd->loop();
   if (millis() > requestDueTime)
   {
     //Serial.print("Free Heap: ");

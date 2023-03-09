@@ -1,8 +1,10 @@
 #define SPOTIFY_CONFIG_JSON "/spotify_diy_config.json"
 
 #define REFRESH_TOKEN_LABEL "refreshToken"
+#define CLIENT_ID_LABEL "clientId"
+#define CLIENT_SECRET_LABEL "clientSecret"
 
-bool fetchConfigFile(char *refreshToken) {
+bool fetchConfigFile(char *refreshToken, char *clientId, char *clientSecret) {
   if (SPIFFS.exists(SPOTIFY_CONFIG_JSON)) {
     //file exists, reading and loading
     Serial.println("reading config file");
@@ -15,7 +17,18 @@ bool fetchConfigFile(char *refreshToken) {
       if (!error) {
         Serial.println("\nparsed json");
 
-        strcpy(refreshToken, json[REFRESH_TOKEN_LABEL]);
+        if(json.containsKey(REFRESH_TOKEN_LABEL)){
+          strcpy(refreshToken, json[REFRESH_TOKEN_LABEL]);
+        }
+
+        if(json.containsKey(CLIENT_ID_LABEL) && json.containsKey(CLIENT_SECRET_LABEL)){
+          strcpy(clientId, json[CLIENT_ID_LABEL]);
+          strcpy(clientSecret, json[CLIENT_SECRET_LABEL]);          
+        } else {
+          Serial.println("Config missing client ID or Secret");
+          return false;
+        }
+
         return true;
 
       } else {
@@ -29,10 +42,12 @@ bool fetchConfigFile(char *refreshToken) {
   }
 }
 
-void saveConfigFile(char *refreshToken) {
+void saveConfigFile(char *refreshToken, char *clientId, char *clientSecret) {
   Serial.println(F("Saving config"));
   StaticJsonDocument<512> json;
   json[REFRESH_TOKEN_LABEL] = refreshToken;
+  json[CLIENT_ID_LABEL] = clientId;
+  json[CLIENT_SECRET_LABEL] = clientSecret;
 
   File configFile = SPIFFS.open(SPOTIFY_CONFIG_JSON, "w");
   if (!configFile) {

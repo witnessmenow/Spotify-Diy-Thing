@@ -186,3 +186,39 @@ void drawTouchButtons(bool backStatus, bool forwardStatus) {
   tft.fillTriangle(rightButtonCenterX + 4, buttonCenterY, rightButtonCenterX - 6, buttonCenterY - 10, rightButtonCenterX - 6, buttonCenterY + 10, TFT_WHITE);
   tft.drawRect(rightButtonCenterX + 6, buttonCenterY - 10, 2, 20, TFT_WHITE);
 }
+
+void drawWifiManagerMessage(WiFiManager *myWiFiManager){
+  Serial.println("Entered Conf Mode");
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("Entered Conf Mode:", screenCenterX, 5, 2);
+  tft.drawString("Connect to the following WIFI AP:", 5, 28, 2);
+  tft.setTextColor(TFT_BLUE, TFT_BLACK);
+  tft.drawString(myWiFiManager->getConfigPortalSSID(), 20, 48, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString("Password:", 5, 64, 2);
+  tft.setTextColor(TFT_BLUE, TFT_BLACK);
+  tft.drawString("thing123", 20, 82, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  
+  tft.drawString("If it doesn't AutoConnect, use this IP:", 5, 110, 2);
+  tft.setTextColor(TFT_BLUE, TFT_BLACK);
+  tft.drawString(WiFi.softAPIP().toString(), 20, 128, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  
+}
+
+void drawRefreshTokenMessage(){
+  Serial.println("Refresh Token Mode");
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("Refresh Token Mode:", screenCenterX, 5, 2);
+  tft.drawString("You need to authorize this device to use", 5, 28, 2);
+  tft.drawString("your spotify account.", 5, 46, 2);
+  
+  tft.drawString("Visit the following address and follow", 5, 82, 2);
+  tft.drawString("the instrucitons:", 5, 100, 2);
+  tft.setTextColor(TFT_BLUE, TFT_BLACK);
+  tft.drawString(WiFi.localIP().toString(), 10, 128, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+}
