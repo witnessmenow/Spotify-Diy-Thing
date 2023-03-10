@@ -34,9 +34,54 @@ The following libraries need to be installed for this project to work:
 | [ArduinoJson](https://github.com/bblanchon/ArduinoJson)                                           | Dependancy of the Spotify API               | Yes ("Arduino Json")         |
 | [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                                    | For decoding the album art images           | Yes ("JPEGDEC")              |
 | [XPT2046 Touchscreen](https://github.com/PaulStoffregen/XPT2046_Touchscreen)                      | For handling the touch screen               | Yes ("XPT2046")              |
+| [WifiManager - By Tzapu](https://github.com/tzapu/WiFiManager)                                    | Captive portal for configuring the WiFi     | Yes ("WifiManager")              |
+| [ESP_DoubleResetDetectorhttps://github.com/khoih-prog/ESP_DoubleResetDetector)                    | Detecting double pressing the reset button  | Yes ("ESP_DoubleResetDetector")              |
 
 ### Display Config
 
 This project makes use of [TFT_eSPI library by Bodmer](https://github.com/Bodmer/TFT_eSPI).
 
 TFT_eSPI is configured using a "User_Setup.h" file in the library folder, you will need to replace this file with the one in the `Display Config` folder of this repo.
+
+## Project Setup
+
+These steps only need to be run once.
+
+### Spotify API
+
+In order to use this project, you will need to create an application on the Spotify Developer Dashboard
+
+- Sign into the [Spotify Developer page](https://developer.spotify.com/dashboard/login)
+- Create a new application. (name it whatever you want)
+- You will need the "client ID" and "client secret" from this page later in the steps
+- You will also need to add a callback URI for authentication process by clicking "Edit Settings", what URI to use will be displayed on screen in a later step.
+
+### Flash the Project
+
+Install from the Arduino IDE, no changes are needed to the code. Web flash version coming soon!
+
+### WiFiManager
+
+In order to enter your wifi details, the project will host it's own wifi network. Connect to it using your phone.
+- SSID: SpotifyDiy
+- Password: thing123
+
+You should be automatically redirected to the config page. 
+- Click Config
+- Enter your WIfi details
+- Enter the client Id and client secret from the earlier step
+- You can leave refresh token blank
+- Click save
+
+Note: If you ever need to get back into WiFiManager, click reset button (the button closest to the side) twice.
+
+### Authenticating the device with your Spotify account
+
+The final step is to connect this device to your Spotify account. When the Wifi is configured correctly, it will enter "Refresh Token Mode".
+
+- Go to the displayed address using your phone or PC
+- Add the address displayed in bold to the callback URI section as mentioned in the Spotify API section
+- Click the `Spotify Auth` URL
+- You will need to give permision to the app you created to have access to your spotify account
+
+Your project should now be setup and will start displaying your currently playing music!
