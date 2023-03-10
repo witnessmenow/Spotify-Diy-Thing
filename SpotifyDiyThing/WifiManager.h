@@ -39,6 +39,8 @@ void setupWiFiManager(bool forceConfig, char *refreshToken, void (*saveConfig)(c
   wm.addParameter(&clientRefreshToken);
 
   if (forceConfig) {
+    // IF we forced config this time, lets stop the double reset so it doesn't get stuck in a loop
+    drd->stop();
     if (!wm.startConfigPortal("SpotifyDIY", "thing123")) {
       Serial.println("failed to connect and hit timeout");
       delay(3000);
