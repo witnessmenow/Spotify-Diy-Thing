@@ -1,9 +1,6 @@
 /*******************************************************************
     Displays Album Art on a 320 x 240 ESP32.
 
-    NOTE: You need to get a Refresh token to use this example
-    Use the getRefreshToken example to get it.
-
     Parts:
     ESP32 With Built in 320x240 LCD with Touch Screen (ESP32-2432S028R)
     https://github.com/witnessmenow/Spotify-Diy-Thing#hardware-required
@@ -42,6 +39,10 @@
 //https://github.com/khoih-prog/ESP_DoubleResetDetector
 
 #include <TFT_eSPI.h>
+// A library for checking if the reset button has been pressed twice
+// Can be used to enable config mode
+// Can be installed from the library manager (Search for "ESP_DoubleResetDetector")
+//https://github.com/khoih-prog/ESP_DoubleResetDetector
 
 #include <JPEGDEC.h>
 // Library for decoding Jpegs from the API responses

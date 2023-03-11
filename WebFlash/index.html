@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+
+<body>
+    <h1>Spotify DIY Thing</h1>
+
+    <p>Something similar to the Spotify Car Thing, built with a cheap ESP32 Screen. Connects to your Spotify account and displays your currently playing song with its album art</p>
+
+    <img src="https://user-images.githubusercontent.com/1562562/221344692-7dd359d3-2e64-4a09-850b-b619477c5043.png" alt="Showing the project"> 
+
+    <div id="main" style="display: none;">
+
+
+        <span>After flashing the project, please follow the steps on the <a href="https://github.com/witnessmenow/Spotify-Diy-Thing#project-setup">project's Github page</a> for setting it up
+            
+        </span>
+
+        <br>
+        <script type="module" src="https://unpkg.com/esp-web-tools@3.4.2/dist/web/install-button.js?module"></script>
+        <esp-web-install-button id="installButton" manifest="bins/manifest.json"></esp-web-install-button>
+        <br>
+        <span>NOTE: Make sure to close anything using your devices com port (e.g. Serial monitor)</span>
+    </div>
+    <div id="notSupported" style="display: none;">
+        Your browser does not support the Web Serial API.
+    </div>
+    
+
+    <script>
+        if(navigator.serial){
+            document.getElementById("notSupported").style.display = 'none';
+            document.getElementById("main").style.display = 'block';
+        } else {
+            document.getElementById("notSupported").style.display = 'block';
+            document.getElementById("main").style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
