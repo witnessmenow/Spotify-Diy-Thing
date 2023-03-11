@@ -1,9 +1,9 @@
 {
-    "name": "WifiTetris",
+    "name": "SpotifyDiyThing",
+    "new_install_prompt_erase": true,
     "builds": [
         {
             "chipFamily": "ESP32",
-            "improv": false,
             "parts": [
                 {
                     "path": "SpotifyDiyThing.ino.bootloader.bin",
