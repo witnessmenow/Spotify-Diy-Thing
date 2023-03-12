@@ -127,7 +127,7 @@ void setup()
   // spiffs already! In this example that is not a problem.
   // I have found once I used the true flag once, I could use it
   // without the true flag after that.
-  bool spiffsInitSuccess = SPIFFS.begin(false) && SPIFFS.begin(true);
+  bool spiffsInitSuccess = SPIFFS.begin(false) || SPIFFS.begin(true);
   if (!spiffsInitSuccess)
   {
     Serial.println("SPIFFS initialisation failed!");
