@@ -58,7 +58,11 @@ In order to use this project, you will need to create an application on the Spot
 
 ### Flash the Project
 
-Install from the Arduino IDE, no changes are needed to the code. Web flash version coming soon!
+Flash the project directly from your browser [here](https://witnessmenow.github.io/Spotify-Diy-Thing/WebFlash/) (Chrome & Edge only)
+
+or 
+
+Install from the Arduino IDE, no changes are needed to the code
 
 ### WiFiManager
 
