@@ -35,7 +35,7 @@ The following libraries need to be installed for this project to work:
 | [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                                    | For decoding the album art images           | Yes ("JPEGDEC")              |
 | [XPT2046 Touchscreen](https://github.com/PaulStoffregen/XPT2046_Touchscreen)                      | For handling the touch screen               | Yes ("XPT2046")              |
 | [WifiManager - By Tzapu](https://github.com/tzapu/WiFiManager)                                    | Captive portal for configuring the WiFi     | Yes ("WifiManager")              |
-| [ESP_DoubleResetDetectorhttps://github.com/khoih-prog/ESP_DoubleResetDetector)                    | Detecting double pressing the reset button  | Yes ("ESP_DoubleResetDetector")              |
+| [ESP_DoubleResetDetector](https://github.com/khoih-prog/ESP_DoubleResetDetector)                  | Detecting double pressing the reset button  | Yes ("ESP_DoubleResetDetector")              |
 
 ### Display Config
 
