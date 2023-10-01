@@ -94,7 +94,12 @@ int displayImageUsingFile(char *albumArtUrl)
     return -1;
   }
 
+  // Spotify uses a different cert for the Image server, so we need to swap to that for the call
+  client.setCACert(spotify_image_server_cert);
   bool gotImage = spotify_display->getImage(albumArtUrl, &f);
+
+  // Swapping back to the main spotify cert
+  client.setCACert(spotify_server_cert);
 
   // Make sure to close the file!
   f.close();

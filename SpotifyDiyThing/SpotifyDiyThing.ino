@@ -48,8 +48,14 @@
 // Library for decoding Jpegs from the API responses
 
 #include <SpotifyArduino.h>
+
+// including a "spotify_server_cert" variable
+// header is included as part of the SpotifyArduino libary
+#include <SpotifyArduinoCert.h>
+
 #include <ArduinoJson.h>
 
+WiFiClientSecure client;
 
 // ----------------------------
 // Internal includes
@@ -67,16 +73,14 @@
 
 #include "WifiManager.h"
 
+//#include "nfc.h"
+
 //------- Replace the following! ------
 
 // Country code, including this is advisable
 #define SPOTIFY_MARKET "IE"
 //------- ---------------------- ------
 
-
-// including a "spotify_server_cert" variable
-// header is included as part of the SpotifyArduino libary
-#include <SpotifyArduinoCert.h>
 
 // so we can compare and not download the same image if we already have it.
 String lastAlbumArtUrl;
@@ -90,7 +94,6 @@ SpotifyImage medImage;
 char *songName;
 char *songArtist;
 
-WiFiClientSecure client;
 SpotifyArduino spotify(client, clientId, clientSecret);
 
 // You might want to make this much smaller, so it will update responsively
@@ -121,6 +124,11 @@ void setup()
 
   displaySetup(&spotify);
   touchSetup(&spotify);
+//  if(nfcSetup(&spotify)){
+//    Serial.println("NFC Good");
+//  } else {
+//    Serial.println("NFC Bad");
+//  }
 
   // Initialise SPIFFS, if this fails try .begin(true)
   // NOTE: I believe this formats it though it will erase everything on
@@ -230,7 +238,10 @@ void handleCurrentlyPlaying(CurrentlyPlaying currentlyPlaying) {
 void loop()
 {
   drd->loop();
-  if (millis() > requestDueTime)
+
+  // bool forceUpdate = nfcLoop();
+  bool forceUpdate = false;
+  if (forceUpdate || millis() > requestDueTime)
   {
     //Serial.print("Free Heap: ");
     //Serial.println(ESP.getFreeHeap());
@@ -294,4 +305,5 @@ void loop()
     requestDueTime = 0; //Some button has been pressed and acted on, it surely impacts the status so force a refresh
     touchScreenCoolDownTime  = millis() + touchScreenCoolDownInterval; //Cool the touch off
   }
+  
 }
