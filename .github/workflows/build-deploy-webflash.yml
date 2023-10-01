@@ -82,7 +82,7 @@ jobs:
           # Copy compiled binaries that were exported by the `-e` flag in the arduino/compile-sketches task
           # Maintain folder structure, for cases where we are compiling for multiple board versions 
           # If we were sure that we would never need to compile for anything other then esp32:esp32:esp32, we could have used this command instead: cp -r OpenMacroRail_Arduino/build/esp32.esp32.esp32/*.bin GitHubPages/ESPWebTools/esp32Firmware
-          cd F1-Notifications/build
+          cd SpotifyDiyThing/build
           find . -print | grep -i .bin$ | xargs -i cp --parent {} ../../GitHubPages/ESPWebTools/cyd
           cd ../..
           
