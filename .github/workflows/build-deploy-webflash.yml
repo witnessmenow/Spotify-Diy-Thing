@@ -62,6 +62,7 @@ jobs:
             - name: ESP_DoubleResetDetector 
             - name: ArduinoJson 
             - name: JPEGDEC
+            - name: XPT2046_Touchscreen
           sketch-paths: |
             - SpotifyDiyThing
           enable-warnings-report: true
