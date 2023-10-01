@@ -4,7 +4,7 @@
  *******************************************************************/
 
 // file name for where to save the image.
-const char* ALBUM_ART = "/album.jpg"
+const char* ALBUM_ART = "/album.jpg";
 
 int imageHeight = 150;
 int imageWidth = 150;
@@ -57,7 +57,7 @@ int32_t mySeek(JPEGFILE *handle, int32_t position) {
   return myfile.seek(position);
 }
 
-int displayImage(char *imageFileUri) {
+int displayImage(const char *imageFileUri) {
   unsigned long lTime = millis();
   lTime = millis();
   jpeg.open((const char *) imageFileUri, myOpen, myClose, myRead, mySeek, JPEGDraw);
