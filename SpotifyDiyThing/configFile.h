@@ -17,13 +17,13 @@ bool fetchConfigFile(char *refreshToken, char *clientId, char *clientSecret) {
       if (!error) {
         Serial.println("\nparsed json");
 
-        if(json.containsKey(REFRESH_TOKEN_LABEL)){
+        if (json.containsKey(REFRESH_TOKEN_LABEL)) {
           strcpy(refreshToken, json[REFRESH_TOKEN_LABEL]);
         }
 
-        if(json.containsKey(CLIENT_ID_LABEL) && json.containsKey(CLIENT_SECRET_LABEL)){
+        if (json.containsKey(CLIENT_ID_LABEL) && json.containsKey(CLIENT_SECRET_LABEL)) {
           strcpy(clientId, json[CLIENT_ID_LABEL]);
-          strcpy(clientSecret, json[CLIENT_SECRET_LABEL]);          
+          strcpy(clientSecret, json[CLIENT_SECRET_LABEL]);
         } else {
           Serial.println("Config missing client ID or Secret");
           return false;
@@ -35,6 +35,9 @@ bool fetchConfigFile(char *refreshToken, char *clientId, char *clientSecret) {
         Serial.println("failed to load json config");
         return false;
       }
+    } else {
+      Serial.println("Failed to open config file");
+      return false;
     }
   } else {
     Serial.println("Config file does not exist");

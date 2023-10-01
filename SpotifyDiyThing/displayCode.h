@@ -4,7 +4,7 @@
  *******************************************************************/
 
 // file name for where to save the image.
-#define ALBUM_ART "/album.jpg"
+const char* ALBUM_ART = "/album.jpg"
 
 int imageHeight = 150;
 int imageWidth = 150;

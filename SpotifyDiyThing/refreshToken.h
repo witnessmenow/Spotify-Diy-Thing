@@ -26,7 +26,7 @@ WebServer server(80);
 
 void handleRoot()
 {
-  char webpage[1100];
+  char webpage[1150];
   char scope[] = "user-read-playback-state%20user-modify-playback-state";
 
   const char *webpageTemplate =
