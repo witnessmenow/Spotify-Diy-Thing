@@ -271,19 +271,19 @@ void loop()
           Serial.println(displayImageResult);
         }
       }
-      else if (status == 204)
-      {
-        songStartMillis = 0;
-        Serial.println("Doesn't seem to be anything playing");
-      }
-      else
-      {
-        Serial.print("Error: ");
-        Serial.println(status);
-      }
-
-      requestDueTime = millis() + delayBetweenRequests;
     }
+    else if (status == 204)
+    {
+      songStartMillis = 0;
+      Serial.println("Doesn't seem to be anything playing");
+    }
+    else
+    {
+      Serial.print("Error: ");
+      Serial.println(status);
+    }
+
+    requestDueTime = millis() + delayBetweenRequests;
   }
   if (songStartMillis != 0 && millis() > progressDueTime) {
     long songProgress = millis() - songStartMillis;
