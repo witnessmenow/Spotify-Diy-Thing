@@ -289,7 +289,8 @@ bool handleTag() {
     delay(100);
   }
 
-//  if (writeTag && nfc.tagPresent()) {
+  if (writeTag && nfc.tagPresent()) {
+    Serial.println("Would write now");
 //
 //    NdefMessage message = NdefMessage();
 //    //This seems to be a blank card, lets write to it
@@ -319,7 +320,7 @@ bool handleTag() {
 //    }
 //
 //    return true;
-//  }
+  }
 
   return false;
 }
