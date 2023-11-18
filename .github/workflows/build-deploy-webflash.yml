@@ -70,6 +70,8 @@ jobs:
           verbose: false
           cli-compile-flags: |
             - --export-binaries
+            - --build-property 
+            - -w
 
       # Copy binaries to GitHubPages folder for publishing
       - name: Copy compiled binaries to CYD
@@ -112,6 +114,8 @@ jobs:
           cli-compile-flags: |
             - --build-property 
             - compiler.cpp.extra_flags=-DMATRIX_DISPLAY
+            - --build-property 
+            - -w
             - --export-binaries
             
       # Copy binaries to GitHubPages folder for publishing
