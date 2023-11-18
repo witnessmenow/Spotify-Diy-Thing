@@ -31,7 +31,6 @@
 // These should be the default SPI pins, but we'll call them out specficially
 #if defined YELLOW_DISPLAY
 
-#include "cheapYellowLCD.h"
 #define NFC_SCLK 18
 #define NFC_MISO 19
 #define NFC_MOSI 23
