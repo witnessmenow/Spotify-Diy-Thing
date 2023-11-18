@@ -6,7 +6,7 @@ on:
   push:
     branches: ["main"]
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,113 +28,70 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      # Install the Arduino CLI
-      - name: Install Arduino CLI
-        uses: arduino/setup-arduino-cli@v1
-
-      # Install TFT_eSPI
-      - name: Install TFT_eSPI library to prepare for modifications
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install PlatformIO
         run: |
-          arduino-cli lib install TFT_eSPI
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
 
-      # Copy binaries to GitHubPages folder for publishing
-      - name: Copy User_Setup.h for TFT_eSPI
+      #Build CYD
+      - name: Build CYD
+        run: platformio run -e cyd
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: CYD Firmware
+          path: .pio/build/cyd/firmware.bin
+          if-no-files-found: error
+      - name: Copy compiled binaries for webflash
         run: |
-          \cp -fR DisplayConfig/User_Setup.h ~/Arduino/libraries/TFT_eSPI/
-
-      # Build CYD Arduino Code
-      - uses: arduino/compile-sketches@v1
-        name: Compile CYD code
-        with: 
-          fqbn: "esp32:esp32:esp32"
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-          # No need to specify ESP-libraries as these are installed with the platform (on the line above). 
-          # Downloading SpeedyStepper from source to get correct casing on import of Arduino.h (spelled arduino.h in the version from Arduino Library Manager)
-          libraries: | 
-            - name: SpotifyArduino
-              source-url: https://github.com/witnessmenow/spotify-api-arduino.git
-            - name: WiFiManager
-            - name: ESP_DoubleResetDetector 
-            - name: ArduinoJson 
-            - name: JPEGDEC
-            - name: Seeed_Arduino_NFC
-              source-url: https://github.com/witnessmenow/Seeed_Arduino_NFC.git
-          sketch-paths: |
-            - SpotifyDiyThing
-          enable-warnings-report: true
-          verbose: false
-          cli-compile-flags: |
-            - --export-binaries
-            - --build-property 
-            - compiler.warning_flags=-Wno-error
-
-      # Copy binaries to GitHubPages folder for publishing
-      - name: Copy compiled binaries to CYD
-        run: |
-          # mkdir GitHubPages/ESPWebTools/esp32Firmware
           mkdir GitHubPages/ESPWebTools/cyd
 
           # Copy the manifest file for the CYD
           cp GitHubPages/ESPWebTools/manifest.json GitHubPages/ESPWebTools/cyd
-          
-          # Copy compiled binaries that were exported by the `-e` flag in the arduino/compile-sketches task
-          # Maintain folder structure, for cases where we are compiling for multiple board versions 
-          # If we were sure that we would never need to compile for anything other then esp32:esp32:esp32, we could have used this command instead: cp -r OpenMacroRail_Arduino/build/esp32.esp32.esp32/*.bin GitHubPages/ESPWebTools/esp32Firmware
-          cd SpotifyDiyThing/build
-          find . -print | grep -i .bin$ | xargs -i cp --parent {} ../../GitHubPages/ESPWebTools/cyd
-          cd ../..
-          
-          # Copy boot_app0.bin to the esp32Firmware folder. This file will be common for all esp32 boards (i think) 
-          # Using a version agnostic search to find the file. grep -m 1 makes sure only one file is copied in case multiple versions are installed.
-          find /home/runner/.arduino15/packages/esp32/hardware/esp32/ -type f | grep -i -m 1 boot_app0.bin$ | xargs -i cp {} GitHubPages/ESPWebTools/cyd
 
-       # Build Matrix Arduino Code
-      - uses: arduino/compile-sketches@v1
-        name: Compile Matrix code
-        with: 
-          fqbn: "esp32:esp32:esp32"
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-          # No need to specify ESP-libraries as these are installed with the platform (on the line above). 
-          # Just need to specify the matrix specific libraries, the others are already installed.
-          libraries: | 
-            - name: ESP32 HUB75 LED MATRIX PANEL DMA Display
-              source-url: https://github.com/witnessmenow/ESP32-HUB75-MatrixPanel-I2S-DMA.git
-            - name: Adafruit GFX Library
-          sketch-paths: |
-            - SpotifyDiyThing
-          enable-warnings-report: true
-          verbose: false
-          cli-compile-flags: |
-            - --build-property 
-            - compiler.cpp.extra_flags=-DMATRIX_DISPLAY
-            - --build-property 
-            - compiler.warning_flags=-Wno-error
-            - --export-binaries
-            
-      # Copy binaries to GitHubPages folder for publishing
-      - name: Copy compiled binaries to Matrix
+          cp .pio/build/cyd/bootloader.bin GitHubPages/ESPWebTools/cyd
+          cp .pio/build/cyd/partitions.bin GitHubPages/ESPWebTools/cyd
+          cp /home/runner/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin GitHubPages/ESPWebTools/cyd
+          cp .pio/build/cyd/firmware.bin GitHubPages/ESPWebTools/cyd
+
+      #Build Matrix
+      - name: Build Matrix
+        run: platformio run -e trinity
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: CYD Firmware
+          path: .pio/build/trinity/firmware.bin
+          if-no-files-found: error
+      - name: Copy compiled binaries for webflash
         run: |
-          # Make matrix directory
           mkdir GitHubPages/ESPWebTools/matrix
 
-          # Copy the manifest file for the matrix
+          # Copy the manifest file for the CYD
           cp GitHubPages/ESPWebTools/manifest.json GitHubPages/ESPWebTools/matrix
-          
-          cd SpotifyDiyThing/build
-          find . -print | grep -i .bin$ | xargs -i cp --parent {} ../../GitHubPages/ESPWebTools/matrix
-          cd ../..
-          
-          # Copy boot_app0.bin to the esp32Firmware folder. This file will be common for all esp32 boards (i think) 
-          # Using a version agnostic search to find the file. grep -m 1 makes sure only one file is copied in case multiple versions are installed.
-          find /home/runner/.arduino15/packages/esp32/hardware/esp32/ -type f | grep -i -m 1 boot_app0.bin$ | xargs -i cp {} GitHubPages/ESPWebTools/matrix
 
+          cp .pio/build/trinity/bootloader.bin GitHubPages/ESPWebTools/matrix
+          cp .pio/build/trinity/partitions.bin GitHubPages/ESPWebTools/matrix
+          cp /home/runner/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin GitHubPages/ESPWebTools/matrix
+          cp .pio/build/trinity/firmware.bin GitHubPages/ESPWebTools/matrix
 
       # Build GitHub Page
       - name: Setup Github Page

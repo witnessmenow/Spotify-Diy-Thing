@@ -15,16 +15,15 @@
 // (Uncomment the required #define)
 
 // 1. Cheap yellow display (Using TFT-eSPI library)
-//#define YELLOW_DISPLAY
+// #define YELLOW_DISPLAY
 
 // 2. Matrix Displays (Like the ESP32 Trinity)
-//#define MATRIX_DISPLAY
+// #define MATRIX_DISPLAY
 
 // If no defines are set, it will default to CYD
 #if !defined(YELLOW_DISPLAY) && !defined(MATRIX_DISPLAY)
 #define YELLOW_DISPLAY // Default to Yellow Display for display type
 #endif
-
 
 #define NFC_ENABLED 1
 
@@ -32,7 +31,7 @@
 // Library Defines - Need to be defined before library import
 // ----------------------------
 
-#define ESP_DRD_USE_SPIFFS      true
+#define ESP_DRD_USE_SPIFFS true
 
 // ----------------------------
 // Standard Libraries
@@ -57,7 +56,7 @@
 // A library for checking if the reset button has been pressed twice
 // Can be used to enable config mode
 // Can be installed from the library manager (Search for "ESP_DoubleResetDetector")
-//https://github.com/khoih-prog/ESP_DoubleResetDetector
+// https://github.com/khoih-prog/ESP_DoubleResetDetector
 
 #include <SpotifyArduino.h>
 
@@ -88,7 +87,7 @@ WiFiClientSecure client;
 
 #include "serialPrint.h"
 
-#include "WifiManager.h"
+#include "WifiManagerHandler.h"
 
 // ----------------------------
 // Display Handling Code
@@ -98,12 +97,12 @@ WiFiClientSecure client;
 
 #include "cheapYellowLCD.h"
 CheapYellowDisplay cyd;
-SpotifyDisplay* spotifyDisplay = &cyd;
+SpotifyDisplay *spotifyDisplay = &cyd;
 
 #elif defined MATRIX_DISPLAY
 #include "matrixDisplay.h"
 MatrixDisplay matrixDisplay;
-SpotifyDisplay* spotifyDisplay = &matrixDisplay;
+SpotifyDisplay *spotifyDisplay = &matrixDisplay;
 
 #endif
 // ----------------------------
@@ -112,7 +111,8 @@ SpotifyDisplay* spotifyDisplay = &matrixDisplay;
 #include "nfc.h"
 #endif
 
-void drawWifiManagerMessage(WiFiManager *myWiFiManager){
+void drawWifiManagerMessage(WiFiManager *myWiFiManager)
+{
   spotifyDisplay->drawWifiManagerMessage(myWiFiManager);
 }
 
@@ -123,7 +123,8 @@ void setup()
   bool forceConfig = false;
 
   drd = new DoubleResetDetector(DRD_TIMEOUT, DRD_ADDRESS);
-  if (drd->detectDoubleReset()) {
+  if (drd->detectDoubleReset())
+  {
     Serial.println(F("Forcing config mode as there was a Double reset detected"));
     forceConfig = true;
   }
@@ -131,9 +132,12 @@ void setup()
   spotifyDisplay->displaySetup(&spotify);
 
 #ifdef NFC_ENABLED
-  if (nfcSetup(&spotify)) {
+  if (nfcSetup(&spotify))
+  {
     Serial.println("NFC Good");
-  } else {
+  }
+  else
+  {
     Serial.println("NFC Bad");
   }
 #endif
@@ -152,9 +156,9 @@ void setup()
   }
   Serial.println("\r\nInitialisation done.");
 
-  pinMode(0, INPUT); //has an internal pullup
   refreshToken[0] = '\0';
-  if (!fetchConfigFile(refreshToken, clientId, clientSecret)) {
+  if (!fetchConfigFile(refreshToken, clientId, clientSecret))
+  {
     // Failed to fetch config file, need to launch Wifi Manager
     forceConfig = true;
   }
@@ -167,11 +171,28 @@ void setup()
 
   spotifySetup(spotifyDisplay, clientId, clientSecret);
 
+#if defined YELLOW_DISPLAY
+
+  pinMode(0, INPUT); // has an internal pullup
+  bool forceRefreshToken = digitalRead(0) == LOW;
+  if (forceRefreshToken)
+  {
+    Serial.println("GPIO 0 is low, forcing refreshToken");
+  }
+
+#else
+  bool forceRefreshToken = false;
+
+#endif
+
   // Check if we have a refresh Token
-  if (digitalRead(0) == LOW || refreshToken[0] == '\0') {
+  if (forceRefreshToken || refreshToken[0] == '\0')
+  {
+
     spotifyDisplay->drawRefreshTokenMessage();
     Serial.println("Launching refresh token flow");
-    if (launchRefreshTokenFlow(&spotify, clientId)) {
+    if (launchRefreshTokenFlow(&spotify, clientId))
+    {
       Serial.print("Refresh Token: ");
       Serial.println(refreshToken);
       saveConfigFile(refreshToken, clientId, clientSecret);
@@ -194,9 +215,8 @@ void loop()
 #else
   bool forceUpdate = false;
 #endif
-  
+
   updateCurrentlyPlaying(forceUpdate);
 
   updateProgressBar();
-
 }
