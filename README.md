@@ -12,38 +12,97 @@ This project is a Work in Progress!
 
 ## Hardware Required
 
-ESP32 With Built in 320x240 LCD with Touch Screen (ESP32-2432S028R), buy from wherever works out cheapest for you:
+This project is designed to make use of basically ready to go hardware, so is very easy to get up and running
+
+Currently this project runs on two types of hardware:
+
+### "Cheap Yellow Display" (CYD)
+
+An ESP32 With Built in 320x240 LCD with Touch Screen (ESP32-2432S028R), buy from wherever works out cheapest for you:
 
 - [Aliexpress\*](https://s.click.aliexpress.com/e/_DkSpIjB)
 - [Aliexpress\*](https://s.click.aliexpress.com/e/_DkcmuCh)
 - [Aliexpress](https://www.aliexpress.com/item/1005004502250619.htm)
-- [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html) - Makerfabs also sell what is required to make a [similar project with an RGB Matrix panel](https://github.com/witnessmenow/Spotify-NFC-Matrix-Display/blob/master/README.md)
+- [Makerfabs](https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html)
 
-* = Affilate Link
+### Matrix panel (ESP32 Trinity)
 
-### Alternate Hardware
+It's built to work with the [ESP32 Trinity](https://github.com/witnessmenow/ESP32-Trinity), an open source board I created for controlling Hub75 Matrix panels, but it will does work with any ESP32 that breaks out enough pins.
 
-There is nothing special about this particaulr display other than it is cheap! This project could be adapted to run on any ESP32 based display. If the display has a different resolution than 320x240 it will need to be modified.
+The display it uses is a 64x64 HUB75 Matrix Panel.
 
-## Software
+All the parts can be purchased from Makerfabs.com:
 
-The following libraries need to be installed for this project to work:
+- [ESP32 Trinity](https://www.makerfabs.com/esp32-trinity.html)
+- [64 x 64 Matrix Panel](https://www.makerfabs.com/64x64-rgb-led-matrix-3mm-pitch.html)
+- Optional: [5V Power Supply](https://www.makerfabs.com/5v-6a-ac-dc-power-adapter-with-cable.html) - You can alternatively use a USB-C power supply
 
-| Library Name/Link                                                                | Purpose                                    | Library manager                 |
-| -------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------- |
-| [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI)                                   | For controlling the LCD Display            | Yes ("tft_espi")                |
-| [SpotifyArduino](https://github.com/witnessmenow/spotify-api-arduino)            | For interacting with Spotify API           | No                              |
-| [ArduinoJson](https://github.com/bblanchon/ArduinoJson)                          | Dependancy of the Spotify API              | Yes ("Arduino Json")            |
-| [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                   | For decoding the album art images          | Yes ("JPEGDEC")                 |
-| [XPT2046 Touchscreen](https://github.com/PaulStoffregen/XPT2046_Touchscreen)     | For handling the touch screen              | Yes ("XPT2046")                 |
-| [WifiManager - By Tzapu](https://github.com/tzapu/WiFiManager)                   | Captive portal for configuring the WiFi    | Yes ("WifiManager")             |
-| [ESP_DoubleResetDetector](https://github.com/khoih-prog/ESP_DoubleResetDetector) | Detecting double pressing the reset button | Yes ("ESP_DoubleResetDetector") |
+\* = Affilate Link
 
-### Display Config
+### BYOD (Bring your own display)
 
-This project makes use of [TFT_eSPI library by Bodmer](https://github.com/Bodmer/TFT_eSPI).
+I've tried to design this project to be modular and have abstracted the display code behind an interface, so it should be pretty easy to get it up and running with a different type of display.
 
-TFT_eSPI is configured using a "User_Setup.h" file in the library folder, you will need to replace this file with the one in the `DisplayConfig` folder of this repo.
+## NFC Tags (Optional)
+
+One of the coolest parts about this project, in my opinion at least, is the ability to connect an NFC reader to control what songs/albums/playlists are being played.
+
+You can write the spotify URI or URL of the song, album or playlist to an NFC tag and when you swipe it off the reader, the device will tell your spotify account to play what it reads.
+
+If you aren't interested in this feature, you can just not connect it and the device will work without it.
+
+### PN532 NFC reader and Tags
+
+This code has been tested with these red PN532 NFC readers and cheap NFC stickers.
+
+To use the PN532 as an SPI device, you need to configure the toggle switches so switch 1 is down and 2 is up. (You may need to remove the sticker on top of it)
+
+#### Links
+
+- [PN532 NFC reader - Aliexpress\*](https://s.click.aliexpress.com/e/_DCanbAB)
+- [NFC Stickers - Aliexpress\*](https://s.click.aliexpress.com/e/_DkX2F5z)
+
+### Hardware support
+
+#### "Cheap Yellow Display" (CYD)
+
+The CYD does not have enough free pins to use an SPI device by default, and the NFC reader is quite slow over i2c, so we need to get creative.
+
+With the help of an "SD Card Sniffer", we can make use of the Micro SD slot of the CYD to connect the NFC reader to.
+
+##### Connections
+
+| Sniffer Board Label | ESP32 Pin | PN532 NFC |
+| ------------------- | --------- | --------- |
+| DAT2                | -         | -         |
+| CD                  | IO5       | CS        |
+| CMD                 | IO23      | DI / MOSI |
+| GND                 | GND       | GND       |
+| VCC                 | 3.3V      | VCC       |
+| CLK                 | IO18      | SCLK      |
+| DAT0                | IO19      | DO / MISO |
+| DAT1                | -         | -         |
+
+#### Links
+
+- [Micro SD Card Sniffer - Aliexpress\*](https://s.click.aliexpress.com/e/_Ddwcy9h)
+
+#### Matrix Panel (ESP32 Trinity)
+
+Again, it is designed for the ESP32 Trinity, but can work with any ESP32 that breaks out the required pins.
+
+The Trinity has some pins broken out that can be used for this purpose
+
+#### Connections
+
+| ESP32 Pin  | PN532 NFC |
+| ---------- | --------- |
+| IO22 (SCL) | CS        |
+| IO21 (SDA) | DI / MOSI |
+| GND        | GND       |
+| 3.3V       | VCC       |
+| IO33       | SCLK      |
+| IO32       | DO / MISO |
 
 ## Project Setup
 
@@ -90,6 +149,46 @@ The final step is to connect this device to your Spotify account. When the Wifi 
 - Go to the displayed address using your phone or PC
 - Add the address displayed in bold to the callback URI section as mentioned in the Spotify API section
 - Click the `Spotify Auth` URL
-- You will need to give permision to the app you created to have access to your spotify account
+- You will need to give permission to the app you created to have access to your spotify account
 
 Your project should now be setup and will start displaying your currently playing music!
+
+## Code
+
+If you want to program the devices yourself using the Arudino IDE, you will need to do the following to get it working
+
+The following libraries need to be installed for this project to work:
+
+| Library Name/Link                                                                | Purpose                                    | Library manager                 |
+| -------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------- |
+| [SpotifyArduino](https://github.com/witnessmenow/spotify-api-arduino)            | For interacting with Spotify API           | No                              |
+| [ArduinoJson](https://github.com/bblanchon/ArduinoJson)                          | Dependancy of the Spotify API              | Yes ("Arduino Json")            |
+| [JPEGDEC](https://github.com/bitbank2/JPEGDEC)                                   | For decoding the album art images          | Yes ("JPEGDEC")                 |
+| [WifiManager - By Tzapu](https://github.com/tzapu/WiFiManager)                   | Captive portal for configuring the WiFi    | Yes ("WifiManager")             |
+| [ESP_DoubleResetDetector](https://github.com/khoih-prog/ESP_DoubleResetDetector) | Detecting double pressing the reset button | Yes ("ESP_DoubleResetDetector") |
+| [Seeed_Arduino_NFC](https://github.com/witnessmenow/Seeed_Arduino_NFC)           | For the NFC reader                         | No (it's a modified version)    |
+
+### Cheap Yellow Display Specific libraries
+
+| Library Name/Link                              | Purpose                         | Library manager  |
+| ---------------------------------------------- | ------------------------------- | ---------------- |
+| [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) | For controlling the LCD Display | Yes ("tft_espi") |
+
+### Matrix Panel Specific libraries
+
+| Library Name/Link                                                                                 | Purpose                          | Library manager          |
+| ------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------ |
+| [ESP32-HUB75-MatrixPanel-I2S-DMA](https://github.com/mrfaptastic/ESP32-HUB75-MatrixPanel-I2S-DMA) | For controlling the LED Matrix   | Yes ("ESP32 MATRIX DMA") |
+| [Adafruit GFX library](https://github.com/adafruit/Adafruit-GFX-Library)                          | Dependency of the Matrix library | Yes ("Adafruit GFX")     |
+
+### Cheap Yellow Display Display Config
+
+The CYD version of the project makes use of [TFT_eSPI library by Bodmer](https://github.com/Bodmer/TFT_eSPI).
+
+TFT_eSPI is configured using a "User_Setup.h" file in the library folder, you will need to replace this file with the one in the `DisplayConfig` folder of this repo.
+
+### Display Selection
+
+At the top of the `SpotifyDiyThing.ino` file, there is a section labeled "Display Type", follow the instructions there for how to enable the different displays.
+
+Note: By default it will use the Cheap Yellow Display

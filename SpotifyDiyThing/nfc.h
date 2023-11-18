@@ -29,14 +29,26 @@
 // If the module has a switch of jumpers to select the mode, make sure it's configured for SPI
 
 // These should be the default SPI pins, but we'll call them out specficially
+#if defined YELLOW_DISPLAY
+
+#include "cheapYellowLCD.h"
 #define NFC_SCLK 18
 #define NFC_MISO 19
 #define NFC_MOSI 23
 #define NFC_SS 5
 
-//The matrix uses the default SPI pins, so we need to use custom ones
+SPIClass nfcSpi = SPIClass(VSPI);
+
+#elif defined MATRIX_DISPLAY
+
+#define NFC_SCLK 33
+#define NFC_MISO 32
+#define NFC_MOSI 21
+#define NFC_SS 22
+
 SPIClass nfcSpi = SPIClass(HSPI);
-// We will begin this spi in the setup
+
+#endif
 
 PN532_SPI pn532spi(nfcSpi, NFC_SS);
 NfcAdapter nfc = NfcAdapter(pn532spi);
@@ -51,16 +63,19 @@ bool forceUpdate = false;
 bool nfcSetup(SpotifyArduino *spotifyObj) {
 
   spotify_nfc = spotifyObj;
-  
+
+#ifdef MATRIX_DISPLAY
+  // matrix display uses custom pins so we need to specify them
   nfcSpi.begin(NFC_SCLK, NFC_MISO, NFC_MOSI, NFC_SS);
+#endif
   nfc.begin();
-  bool nfcStatus = nfc.fail;
-  if (nfc.fail) {
+  bool nfcStatus = !nfc.fail;
+  if (nfcStatus) {
     // Could while loop here if you wanted
     //dma_display->print("NO!");
-    Serial.println("NFC reader - not working!!!");
-  } else {
     Serial.println("NFC reader - OK!");
+  } else {
+    Serial.println("NFC reader - not working!!!");
     //dma_display->print("OK!");
   }
 
