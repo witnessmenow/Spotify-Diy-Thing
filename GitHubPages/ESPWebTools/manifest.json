@@ -1,5 +1,5 @@
 {
-    "name": "F1 Notifications Firmware",
+    "name": "Spotify DIY Thing Firmware",
     "new_install_prompt_erase": false,
     "builds": [
         {
@@ -10,15 +10,15 @@
                     "offset": 57344
                 },
                 {
-                    "path": "esp32.esp32.esp32/SpotifyDiyThing.ino.bin",
+                    "path": "firmware.bin",
                     "offset": 65536
                 },
                 {
-                    "path": "esp32.esp32.esp32/SpotifyDiyThing.ino.bootloader.bin",
+                    "path": "bootloader.bin",
                     "offset": 4096
                 },
                 {
-                    "path": "esp32.esp32.esp32/SpotifyDiyThing.ino.partitions.bin",
+                    "path": "partitions.bin",
                     "offset": 32768
                 }
             ]
