@@ -27,6 +27,9 @@
 
 #define NFC_ENABLED 1
 
+// This causes issues in certain circumstances e.g. Play an album and let it auto play to related songs
+bool writeContextToNfc = true;
+
 // ----------------------------
 // Library Defines - Need to be defined before library import
 // ----------------------------
@@ -210,10 +213,18 @@ void loop()
 
   spotifyDisplay->checkForInput();
 
-#ifdef NFC_ENABLED
-  bool forceUpdate = nfcLoop(lastTrackUri);
-#else
   bool forceUpdate = false;
+
+#ifdef NFC_ENABLED
+  if (writeContextToNfc)
+  {
+    forceUpdate = nfcLoop(lastTrackUri, lastTrackContextUri);
+  }
+  else
+  {
+    forceUpdate = nfcLoop(lastTrackUri);
+  }
+
 #endif
 
   updateCurrentlyPlaying(forceUpdate);

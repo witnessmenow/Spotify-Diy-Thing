@@ -8,6 +8,7 @@ long songStartMillis;
 long songDuration;
 
 char lastTrackUri[200];
+char lastTrackContextUri[200];
 
 // You might want to make this much smaller, so it will update responsively
 
@@ -22,16 +23,32 @@ void spotifySetup(SpotifyDisplay *theDisplay, const char *clientId, const char *
   sp_Display = theDisplay;
   client.setCACert(spotify_server_cert);
   spotify.lateInit(clientId, clientSecret);
+
+  lastTrackUri[0] = '\0';
+  lastTrackContextUri[0] = '\0';
 }
 
 bool isSameTrack(const char *trackUri)
 {
+
   return strcmp(lastTrackUri, trackUri) == 0;
 }
 
 void setTrackUri(const char *trackUri)
 {
   strcpy(lastTrackUri, trackUri);
+}
+
+void setTrackContextUri(const char *trackContext)
+{
+  if (trackContext == NULL)
+  {
+    lastTrackContextUri[0] = '\0';
+  }
+  else
+  {
+    strcpy(lastTrackContextUri, trackContext);
+  }
 }
 
 void spotifyRefreshToken(const char *refreshToken)
@@ -50,32 +67,33 @@ void spotifyRefreshToken(const char *refreshToken)
 
 void handleCurrentlyPlaying(CurrentlyPlaying currentlyPlaying)
 {
-
-  // printCurrentlyPlayingToSerial(currentlyPlaying);
-
-  if (!isSameTrack(currentlyPlaying.trackUri))
+  if (currentlyPlaying.trackUri != NULL)
   {
-    setTrackUri(currentlyPlaying.trackUri);
+    if (!isSameTrack(currentlyPlaying.trackUri))
+    {
+      setTrackUri(currentlyPlaying.trackUri);
+      setTrackContextUri(currentlyPlaying.contextUri);
 
-    // We have a new Song, need to update the text
-    sp_Display->printCurrentlyPlayingToScreen(currentlyPlaying);
-  }
+      // We have a new Song, need to update the text
+      sp_Display->printCurrentlyPlayingToScreen(currentlyPlaying);
+    }
 
-  albumArtChanged = sp_Display->processImageInfo(currentlyPlaying);
+    albumArtChanged = sp_Display->processImageInfo(currentlyPlaying);
 
-  sp_Display->displayTrackProgress(currentlyPlaying.progressMs, currentlyPlaying.durationMs);
+    sp_Display->displayTrackProgress(currentlyPlaying.progressMs, currentlyPlaying.durationMs);
 
-  if (currentlyPlaying.isPlaying)
-  {
-    // If we know at what millis the song started at, we can make a good guess
-    // at updating the progress bar more often than checking the API
-    songStartMillis = millis() - currentlyPlaying.progressMs;
-    songDuration = currentlyPlaying.durationMs;
-  }
-  else
-  {
-    // Song doesn't seem to be playing, do not update the progress
-    songStartMillis = 0;
+    if (currentlyPlaying.isPlaying)
+    {
+      // If we know at what millis the song started at, we can make a good guess
+      // at updating the progress bar more often than checking the API
+      songStartMillis = millis() - currentlyPlaying.progressMs;
+      songDuration = currentlyPlaying.durationMs;
+    }
+    else
+    {
+      // Song doesn't seem to be playing, do not update the progress
+      songStartMillis = 0;
+    }
   }
 }
 

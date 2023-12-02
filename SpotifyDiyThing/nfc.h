@@ -224,7 +224,7 @@ bool updateSpotify(char *tagContent)
   return false;
 }
 
-bool handleTag(const char *trackUri)
+bool handleTag(const char *trackUri, const char *contextUri)
 {
   NfcTag tag = nfc.read();
 
@@ -287,8 +287,6 @@ bool handleTag(const char *trackUri)
             Serial.println(uid);
           }
 
-          // Force the data into a String (might work depending on the content)
-          // Real code should use smarter processing
           char payloadAsString[payloadLength + 1];
           int numChars = 0;
           for (int c = 0; c < payloadLength; c++)
@@ -340,6 +338,7 @@ bool handleTag(const char *trackUri)
     Serial.println("Writing track");
 
     int trackLength = strlen(trackUri);
+    int contextLength = 0;
 
     NdefMessage message = NdefMessage();
     // This seems to be a blank card, lets write to it
@@ -351,14 +350,39 @@ bool handleTag(const char *trackUri)
     mimeType.getBytes(type, sizeof(type));
     r.setType(type, mimeType.length());
 
+    bool hasContext = false;
+
+    if (contextUri != NULL)
+    {
+      int contextLengthCheck = strlen(contextUri);
+
+      if (contextLengthCheck > 0)
+      {
+        hasContext = true;
+
+        // extra 1 for comma
+        contextLength = contextLengthCheck + 1;
+      }
+    }
+
     // One for new line, one for the 0x00 needed at the start
-    byte payloadBytes[trackLength + 2];
+    int payloadLength = trackLength + contextLength + 2;
+
+    // One for new line, one for the 0x00 needed at the start
+    byte payloadBytes[payloadLength];
     // Write to the new buffer offset by one
     // currentTrackUri.getBytes(&payloadBytes[1], trackLength + 1);
     memcpy(payloadBytes + sizeof(byte), trackUri, trackLength + 1);
     payloadBytes[0] = 0;
 
-    r.setPayload(payloadBytes, trackLength + 1);
+    if (hasContext)
+    {
+      payloadBytes[trackLength + 1] = ',';
+      // extra 1 for comma
+      memcpy(payloadBytes + (sizeof(byte) * (trackLength + 2)), contextUri, contextLength);
+    }
+
+    r.setPayload(payloadBytes, payloadLength - 1); // not sure why this is -1
 
     message.addRecord(r);
     boolean success = nfc.write(message);
@@ -379,12 +403,12 @@ bool handleTag(const char *trackUri)
   return false;
 }
 
-bool nfcLoop(const char *trackUri)
+bool nfcLoop(const char *trackUri, const char *contextUri = NULL)
 {
   forceUpdate = false;
   if (millis() > nfcDueTime)
   {
-    if (nfc.tagPresent() && handleTag(trackUri))
+    if (nfc.tagPresent() && handleTag(trackUri, contextUri))
     {
       Serial.println("Successful Read - Back to loop:");
       nfcDueTime = millis() + 5000; // 5 second cool down on NFC tag if succesful
