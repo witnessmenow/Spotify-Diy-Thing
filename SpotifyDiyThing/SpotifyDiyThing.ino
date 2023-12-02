@@ -132,7 +132,7 @@ void setup()
   spotifyDisplay->displaySetup(&spotify);
 
 #ifdef NFC_ENABLED
-  if (nfcSetup(&spotify))
+  if (nfcSetup(&spotify, spotifyDisplay))
   {
     Serial.println("NFC Good");
   }
@@ -211,7 +211,7 @@ void loop()
   spotifyDisplay->checkForInput();
 
 #ifdef NFC_ENABLED
-  bool forceUpdate = nfcLoop();
+  bool forceUpdate = nfcLoop(lastTrackUri);
 #else
   bool forceUpdate = false;
 #endif
