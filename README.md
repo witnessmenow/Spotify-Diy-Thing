@@ -108,24 +108,27 @@ The Trinity has some pins broken out that can be used for this purpose
 
 These steps only need to be run once.
 
-### Spotify API
+### Step 1 - Spotify Dev Account
 
 In order to use this project, you will need to create an application on the Spotify Developer Dashboard
 
 - Sign into the [Spotify Developer page](https://developer.spotify.com/dashboard/login)
-- Create a new application. (name it whatever you want)
+- Create a new application. (name it whatever you want). There is a section fo "callback URI" you can just make this "locahost" for now.
 - You will need the "client ID" and "client secret" from this page later in the steps
-- You will also need to add a callback URI for authentication process by clicking "Edit Settings", what URI to use will be displayed on screen in a later step.
 
-### Flash the Project
+You will need to add a callback URI for authentication process by clicking "Edit Settings", what URI to use will be displayed on screen in a later step.
+
+### Step 2 - Flash the Project
 
 Flash the project directly from your browser [here](https://witnessmenow.github.io/Spotify-Diy-Thing) (Chrome & Edge only)
 
 or
 
-Install from the Arduino IDE, no changes are needed to the code
+Jump to the "code" section below
 
-### WiFiManager
+### Step 3 - Adding your Wifi and Spotify Details
+
+The device is now flashed with the code, but it doesn't know what your Wifi or Spotify details are.
 
 In order to enter your wifi details, the project will host it's own wifi network. Connect to it using your phone.
 
@@ -135,19 +138,20 @@ In order to enter your wifi details, the project will host it's own wifi network
 You should be automatically redirected to the config page.
 
 - Click Config
-- Enter your WIfi details
+- Enter your WIfi details (2.4Ghz only)
 - Enter the client Id and client secret from the earlier step
 - You can leave refresh token blank
 - Click save
 
-Note: If you ever need to get back into WiFiManager, click reset button (the button closest to the side) twice.
+Note: If you ever need to get back into this config section, click reset button (the button closest to the side) twice.
 
-### Authenticating the device with your Spotify account
+### Step 4 - Authenticating the device with your Spotify account
 
 The final step is to connect this device to your Spotify account. When the Wifi is configured correctly, it will enter "Refresh Token Mode".
 
-- Go to the displayed address using your phone or PC
-- Add the address displayed in bold to the callback URI section as mentioned in the Spotify API section
+- Your device will now be connected to the Wifi details you gave it.
+- Go to the displayed address displayed on screen using your phone or PC that is connected to the same network as your device.
+- On the webpage that loads there will be an address displayed in bold, add this to the callback URI section as mentioned in the Spotify API section
 - Click the `Spotify Auth` URL
 - You will need to give permission to the app you created to have access to your spotify account
 
