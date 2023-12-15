@@ -150,7 +150,7 @@ Note: If you ever need to get back into this config section, click reset button 
 The final step is to connect this device to your Spotify account. When the Wifi is configured correctly, it will enter "Refresh Token Mode".
 
 - Your device will now be connected to the Wifi details you gave it.
-- Go to the displayed address displayed on screen using your phone or PC that is connected to the same network as your device.
+- Go to the address displayed on screen using your phone or PC that is connected to the same network as your device.
 - On the webpage that loads there will be an address displayed in bold, add this to the callback URI section as mentioned in the Spotify API section
 - Click the `Spotify Auth` URL
 - You will need to give permission to the app you created to have access to your spotify account
