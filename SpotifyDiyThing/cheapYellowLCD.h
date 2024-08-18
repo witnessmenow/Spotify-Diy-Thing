@@ -119,6 +119,18 @@ public:
 
     // Fill whats left black
     tft.fillRect(20 + barXWidth, progressStartY + 1, (screenWidth - 20) - (20 + barXWidth), 18, TFT_BLACK);
+
+    // Display elapsed time in format 00:00 to left of the progress bar
+    char elapsedString[6];
+    snprintf(elapsedString, sizeof(elapsedString), "%02d:%02d", (progress / 1000) / 60, (progress / 1000) % 60);
+    tft.setTextDatum(TL_DATUM);
+    tft.drawString(elapsedString, 5, progressStartY - 20, 2);
+
+    // Display total time in format 00:00 to right of the progress bar
+    char totalString[6];
+    snprintf(totalString, sizeof(totalString), "%02d:%02d", (duration / 1000) / 60, (duration / 1000) % 60);
+    tft.setTextDatum(TR_DATUM);
+    tft.drawString(totalString, screenWidth - 5, progressStartY - 20, 2);
   }
 
   void printCurrentlyPlayingToScreen(CurrentlyPlaying currentlyPlaying)
